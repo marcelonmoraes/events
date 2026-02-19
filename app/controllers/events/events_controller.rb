@@ -3,7 +3,7 @@ module Events
     PER_PAGE = 50
 
     def index
-      @events = Event.reverse_chronological
+      @events = Event.roots.reverse_chronological
 
       apply_filters
       apply_cursor_pagination
@@ -15,6 +15,7 @@ module Events
 
     def show
       @event = Event.find(params[:id])
+      @children = @event.children.reverse_chronological
     end
 
     private

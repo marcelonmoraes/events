@@ -80,4 +80,27 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal true, config.record_request_info
     assert_nil config.purge_after
   end
+
+  test "Events.record with parent event" do
+    parent = Events.record(name: "order.completed")
+    child = Events.record(name: "payment.processed", parent: parent)
+
+    assert_equal parent, child.parent
+    assert_includes parent.children, child
+  end
+
+  test "Events.record with parent_id" do
+    parent = Events.record(name: "order.completed")
+    child = Events.record(name: "payment.processed", parent: parent.id)
+
+    assert_equal parent, child.parent
+  end
+
+  test "Events.record_later with parent enqueues job with parent_id" do
+    parent = Events.record(name: "order.completed")
+
+    assert_enqueued_with(job: Events::RecordEventJob) do
+      Events.record_later(name: "payment.processed", parent: parent)
+    end
+  end
 end
