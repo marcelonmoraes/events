@@ -106,5 +106,49 @@ module Events
       assert_equal "value", event.metadata["key"]
       assert_equal 1, event.metadata["nested"]["a"]
     end
+
+    test "parent and children associations" do
+      parent = Event.create!(name: "order.completed")
+      child1 = Event.create!(name: "payment.processed", parent: parent)
+      child2 = Event.create!(name: "stock.reserved", parent: parent)
+
+      assert_equal parent, child1.parent
+      assert_equal parent, child2.parent
+      assert_includes parent.children, child1
+      assert_includes parent.children, child2
+    end
+
+    test "roots scope returns only events without parent" do
+      parent = Event.create!(name: "order.completed")
+      Event.create!(name: "payment.processed", parent: parent)
+
+      roots = Event.roots
+      assert_includes roots, parent
+      assert_equal 1, roots.count
+    end
+
+    test "root? returns true for events without parent" do
+      event = Event.create!(name: "order.completed")
+      assert event.root?
+      assert_not event.child?
+    end
+
+    test "child? returns true for events with parent" do
+      parent = Event.create!(name: "order.completed")
+      child = Event.create!(name: "payment.processed", parent: parent)
+
+      assert child.child?
+      assert_not child.root?
+    end
+
+    test "dependent destroy removes children" do
+      parent = Event.create!(name: "order.completed")
+      Event.create!(name: "payment.processed", parent: parent)
+      Event.create!(name: "stock.reserved", parent: parent)
+
+      assert_difference "Event.count", -3 do
+        parent.destroy!
+      end
+    end
   end
 end

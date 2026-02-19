@@ -12,11 +12,14 @@ module Events
       yield(configuration)
     end
 
-    def record(name:, actor: nil, target: nil, metadata: {}, source: nil, ip_address: nil, user_agent: nil, request_id: nil)
+    def record(name:, actor: nil, target: nil, parent: nil, metadata: {}, source: nil, ip_address: nil, user_agent: nil, request_id: nil)
+      parent_id = parent.is_a?(Events::Event) ? parent.id : parent
+
       Events::Event.create!(
         name: name,
         actor: actor,
         target: target,
+        parent_id: parent_id,
         metadata: metadata,
         source: source || configuration.default_source,
         ip_address: ip_address,
@@ -25,7 +28,7 @@ module Events
       )
     end
 
-    def record_later(name:, actor: nil, target: nil, metadata: {}, source: nil, ip_address: nil, user_agent: nil, request_id: nil)
+    def record_later(name:, actor: nil, target: nil, parent: nil, metadata: {}, source: nil, ip_address: nil, user_agent: nil, request_id: nil)
       attributes = {
         name: name,
         metadata: metadata,
@@ -37,6 +40,7 @@ module Events
 
       attributes[:actor] = actor.to_global_id.to_s if actor
       attributes[:target] = target.to_global_id.to_s if target
+      attributes[:parent_id] = parent.is_a?(Events::Event) ? parent.id : parent if parent
 
       Events::RecordEventJob.perform_later(attributes)
     end

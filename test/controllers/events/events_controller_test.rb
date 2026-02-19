@@ -72,6 +72,45 @@ module Events
       assert_select "span.events-badge", "test.detail"
     end
 
+    test "index shows only root events" do
+      parent = Event.create!(name: "order.completed", source: "test")
+      Event.create!(name: "payment.processed", parent: parent, source: "test")
+
+      get events_url
+      assert_response :success
+      assert_select "table.events-table tbody tr", 6 # 5 from setup + 1 parent
+    end
+
+    test "index shows children count" do
+      parent = Event.create!(name: "order.completed", source: "test")
+      Event.create!(name: "payment.processed", parent: parent, source: "test")
+      Event.create!(name: "stock.reserved", parent: parent, source: "test")
+
+      get events_url
+      assert_response :success
+      assert_select "th", "Children"
+    end
+
+    test "show displays children table" do
+      parent = Event.create!(name: "order.completed")
+      Event.create!(name: "payment.processed", parent: parent)
+      Event.create!(name: "stock.reserved", parent: parent)
+
+      get event_url(parent)
+      assert_response :success
+      assert_select "h2", "Sub-events"
+      assert_select "table.events-table tbody tr", 2
+    end
+
+    test "show displays parent link for child event" do
+      parent = Event.create!(name: "order.completed")
+      child = Event.create!(name: "payment.processed", parent: parent)
+
+      get event_url(child)
+      assert_response :success
+      assert_select "a.events-link", "Event ##{parent.id}"
+    end
+
     private
 
     def events_url(params = {})

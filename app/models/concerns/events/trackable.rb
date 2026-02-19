@@ -14,21 +14,23 @@ module Events
                dependent: :nullify
     end
 
-    def track_event(name, target: nil, metadata: {})
+    def track_event(name, target: nil, parent: nil, metadata: {})
       Events.record(
         name: name,
         actor: self,
         target: target,
+        parent: parent,
         metadata: metadata,
         source: "model"
       )
     end
 
-    def track_event_as_target(name, actor: nil, metadata: {})
+    def track_event_as_target(name, actor: nil, parent: nil, metadata: {})
       Events.record(
         name: name,
         actor: actor,
         target: self,
+        parent: parent,
         metadata: metadata,
         source: "model"
       )
