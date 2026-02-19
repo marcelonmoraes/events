@@ -1,0 +1,44 @@
+<div class="events-dashboard">
+  <p><%= link_to "Back to events", events_path, class: "events-link" %></p>
+
+  <h1>Event #<%= @event.id %></h1>
+
+  <table class="events-detail">
+    <tr>
+      <th>Name</th>
+      <td><span class="events-badge"><%= @event.name %></span></td>
+    </tr>
+    <tr>
+      <th>Source</th>
+      <td><span class="events-badge events-badge--source"><%= @event.source %></span></td>
+    </tr>
+    <tr>
+      <th>Actor</th>
+      <td><%= @event.actor ? "#{@event.actor_type}##{@event.actor_id}" : "-" %></td>
+    </tr>
+    <tr>
+      <th>Target</th>
+      <td><%= @event.target ? "#{@event.target_type}##{@event.target_id}" : "-" %></td>
+    </tr>
+    <tr>
+      <th>Metadata</th>
+      <td><pre class="events-json"><%= JSON.pretty_generate(@event.metadata) %></pre></td>
+    </tr>
+    <tr>
+      <th>IP address</th>
+      <td><%= @event.ip_address || "-" %></td>
+    </tr>
+    <tr>
+      <th>User agent</th>
+      <td><%= @event.user_agent || "-" %></td>
+    </tr>
+    <tr>
+      <th>Request ID</th>
+      <td><%= @event.request_id || "-" %></td>
+    </tr>
+    <tr>
+      <th>Created at</th>
+      <td><%= @event.created_at.strftime("%Y-%m-%d %H:%M:%S %Z") %></td>
+    </tr>
+  </table>
+</div>
