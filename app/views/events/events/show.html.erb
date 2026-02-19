@@ -8,6 +8,12 @@
       <th>Name</th>
       <td><span class="events-badge"><%= @event.name %></span></td>
     </tr>
+    <% if @event.parent %>
+    <tr>
+      <th>Parent</th>
+      <td><%= link_to "Event ##{@event.parent_id}", event_path(@event.parent), class: "events-link" %></td>
+    </tr>
+    <% end %>
     <tr>
       <th>Source</th>
       <td><span class="events-badge events-badge--source"><%= @event.source %></span></td>
@@ -41,4 +47,33 @@
       <td><%= @event.created_at.strftime("%Y-%m-%d %H:%M:%S %Z") %></td>
     </tr>
   </table>
+
+  <% if @children.any? %>
+    <h2>Sub-events</h2>
+
+    <table class="events-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Name</th>
+          <th>Source</th>
+          <th>Actor</th>
+          <th>Target</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @children.each do |child| %>
+          <tr>
+            <td class="events-time"><%= child.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+            <td><span class="events-badge"><%= child.name %></span></td>
+            <td><span class="events-badge events-badge--source"><%= child.source %></span></td>
+            <td><%= child.actor ? "#{child.actor_type}##{child.actor_id}" : "-" %></td>
+            <td><%= child.target ? "#{child.target_type}##{child.target_id}" : "-" %></td>
+            <td><%= link_to "Detail", event_path(child), class: "events-link" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
 </div>
