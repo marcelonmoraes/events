@@ -9,7 +9,7 @@ Events are stored in the database and viewable through a mountable monitor dashb
 Add to your Gemfile:
 
 ```ruby
-gem "events", path: "path/to/events" # or from your gem server
+gem "events", github: "marcelonmoraes/events"
 ```
 
 Then run:
