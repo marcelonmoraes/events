@@ -18,13 +18,14 @@ module Events
 
     private
 
-    def record_event(name, target: nil, metadata: {})
+    def record_event(name, target: nil, parent: nil, metadata: {})
       actor = resolve_actor
 
       attributes = {
         name: name,
         actor: actor,
         target: target,
+        parent: parent,
         metadata: metadata,
         source: "controller"
       }
