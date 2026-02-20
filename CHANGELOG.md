@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Fix Rails dependency constraint to >= 7.1, < 9
+
 ## 0.1.2
 
 - Broaden Rails dependency to accept any version >= 7.0
