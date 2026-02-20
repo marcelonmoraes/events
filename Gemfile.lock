@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    events (0.1.0)
+    sinaliza (0.1.0)
       rails (>= 8.1.2)
 
 GEM
@@ -247,10 +247,10 @@ PLATFORMS
   x86_64-linux-gnu
 
 DEPENDENCIES
-  events!
   propshaft
   puma
   rubocop-rails-omakase
+  sinaliza!
   sqlite3
 
 BUNDLED WITH

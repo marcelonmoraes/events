@@ -1,0 +1,45 @@
+<div class="sinaliza-dashboard">
+  <h1>Events Monitor</h1>
+
+  <%= render "filters" %>
+
+  <table class="sinaliza-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Name</th>
+        <th>Source</th>
+        <th>Actor</th>
+        <th>Target</th>
+        <th>Children</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @events.each do |event| %>
+        <tr>
+          <td class="sinaliza-time"><%= event.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+          <td><span class="sinaliza-badge"><%= event.name %></span></td>
+          <td><span class="sinaliza-badge sinaliza-badge--source"><%= event.source %></span></td>
+          <td><%= event.actor ? "#{event.actor_type}##{event.actor_id}" : "-" %></td>
+          <td><%= event.target ? "#{event.target_type}##{event.target_id}" : "-" %></td>
+          <td><%= event.children.size %></td>
+          <td><%= link_to "Detail", event_path(event), class: "sinaliza-link" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @events.empty? %>
+    <p class="sinaliza-empty">No events found.</p>
+  <% end %>
+
+  <% if @has_next_page %>
+    <div class="sinaliza-pagination">
+      <%
+        pagination_params = request.query_parameters.merge(before_id: @next_cursor)
+      %>
+      <%= link_to "Older events", events_path(pagination_params), class: "sinaliza-link" %>
+    </div>
+  <% end %>
+</div>

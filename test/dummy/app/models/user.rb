@@ -1,3 +1,3 @@
 class User < ApplicationRecord
-  include Events::Trackable
+  include Sinaliza::Trackable
 end
