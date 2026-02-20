@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Broaden Rails dependency to accept any version >= 7.0
+- Add CI matrix testing Ruby 3.1–3.4 with Rails 7.1–8.1
+
 ## 0.1.1
 
 - Broaden Rails dependency to accept any version >= 8.0
