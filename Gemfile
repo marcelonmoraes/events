@@ -3,6 +3,9 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in sinaliza.gemspec.
 gemspec
 
+rails_version = ENV.fetch("RAILS_VERSION", "8.1")
+gem "rails", "~> #{rails_version}.0"
+
 gem "puma"
 
 gem "sqlite3"
