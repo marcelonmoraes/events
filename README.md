@@ -9,7 +9,7 @@ Events are stored in the database and viewable through a mountable monitor dashb
 Add to your Gemfile:
 
 ```ruby
-gem "sinaliza", github: "marcelonmoraes/sinaliza"
+gem "sinaliza"
 ```
 
 Then run:
