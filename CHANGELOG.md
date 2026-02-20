@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Add polymorphic `context` association for grouping events under a business object
+- Add `by_context` and `by_context_type` query scopes
+- Add `track_event_as_context` helper to Trackable concern
+- Update monitor dashboard with context column, filter, and children count
+
 ## 0.1.3
 
 - Fix Rails dependency constraint to >= 7.1, < 9
