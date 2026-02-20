@@ -1,4 +1,4 @@
-# Events
+# Sinaliza
 
 A Rails engine for recording and browsing application events. Track user actions, system events, and anything worth logging — from models, controllers, or anywhere in your code.
 
@@ -9,21 +9,21 @@ Events are stored in the database and viewable through a mountable monitor dashb
 Add to your Gemfile:
 
 ```ruby
-gem "events", github: "marcelonmoraes/events"
+gem "sinaliza", github: "marcelonmoraes/sinaliza"
 ```
 
 Then run:
 
 ```bash
 bundle install
-bin/rails events:install:migrations
+bin/rails sinaliza:install:migrations
 bin/rails db:migrate
 ```
 
 Mount the engine in your `config/routes.rb`:
 
 ```ruby
-mount Events::Engine => "/events"
+mount Sinaliza::Engine => "/sinaliza"
 ```
 
 ## Usage
@@ -32,10 +32,10 @@ mount Events::Engine => "/events"
 
 ```ruby
 # Synchronous
-Events.record(name: "user.signed_up", actor: user, metadata: { plan: "pro" })
+Sinaliza.record(name: "user.signed_up", actor: user, metadata: { plan: "pro" })
 
 # Asynchronous (via ActiveJob)
-Events.record_later(name: "report.generated", target: report)
+Sinaliza.record_later(name: "report.generated", target: report)
 ```
 
 Both methods accept:
@@ -51,13 +51,13 @@ Both methods accept:
 | `user_agent`| User agent string                    | `nil`                 |
 | `request_id`| Request ID                           | `nil`                 |
 
-### Model concern — `Events::Trackable`
+### Model concern — `Sinaliza::Trackable`
 
 Include in any model to get event associations and helper methods:
 
 ```ruby
 class User < ApplicationRecord
-  include Events::Trackable
+  include Sinaliza::Trackable
 end
 ```
 
@@ -75,13 +75,13 @@ post.track_event_as_target("post.featured", actor: admin)
 
 Events are recorded with `source: "model"`. When an actor or target is destroyed, associated events are preserved with nullified references (`dependent: :nullify`).
 
-### Controller concern — `Events::Traceable`
+### Controller concern — `Sinaliza::Traceable`
 
 Include in any controller to track actions declaratively or manually:
 
 ```ruby
 class OrdersController < ApplicationController
-  include Events::Traceable
+  include Sinaliza::Traceable
 
   # Declarative — runs as an after_action callback
   track_event "orders.listed", only: :index
@@ -104,26 +104,26 @@ end
 
 Events are recorded with `source: "controller"`. Request context (IP address, user agent, request ID) is captured automatically based on configuration.
 
-The actor is resolved by calling the method defined in `Events.configuration.actor_method` (default: `current_user`).
+The actor is resolved by calling the method defined in `Sinaliza.configuration.actor_method` (default: `current_user`).
 
 ### Query scopes
 
 ```ruby
-Events::Event.by_name("user.login")
-Events::Event.by_source("controller")
-Events::Event.by_actor_type("User")
-Events::Event.since(1.week.ago)
-Events::Event.before(Date.yesterday)
-Events::Event.between(1.week.ago, 1.day.ago)
-Events::Event.search("login")
-Events::Event.chronological          # oldest first
-Events::Event.reverse_chronological  # newest first
+Sinaliza::Event.by_name("user.login")
+Sinaliza::Event.by_source("controller")
+Sinaliza::Event.by_actor_type("User")
+Sinaliza::Event.since(1.week.ago)
+Sinaliza::Event.before(Date.yesterday)
+Sinaliza::Event.between(1.week.ago, 1.day.ago)
+Sinaliza::Event.search("login")
+Sinaliza::Event.chronological          # oldest first
+Sinaliza::Event.reverse_chronological  # newest first
 ```
 
 Scopes are chainable:
 
 ```ruby
-Events::Event.by_name("order.created").by_actor_type("User").since(1.day.ago)
+Sinaliza::Event.by_name("order.created").by_actor_type("User").since(1.day.ago)
 ```
 
 ## Dashboard
@@ -141,22 +141,22 @@ The gem does not include authentication. Protect access via route constraints in
 ```ruby
 # config/routes.rb
 authenticate :user, ->(u) { u.admin? } do
-  mount Events::Engine => "/events"
+  mount Sinaliza::Engine => "/sinaliza"
 end
 
 # or with a simple constraint
-mount Events::Engine => "/events", constraints: AdminConstraint.new
+mount Sinaliza::Engine => "/sinaliza", constraints: AdminConstraint.new
 ```
 
 ## Configuration
 
 ```ruby
-# config/initializers/events.rb
-Events.configure do |config|
+# config/initializers/sinaliza.rb
+Sinaliza.configure do |config|
   # Controller method used to resolve the actor (default: :current_user)
   config.actor_method = :current_user
 
-  # Default source label for Events.record calls (default: "manual")
+  # Default source label for Sinaliza.record calls (default: "manual")
   config.default_source = "manual"
 
   # Capture IP, user agent, and request ID in controller events (default: true)
@@ -172,14 +172,14 @@ end
 If `purge_after` is configured, run the rake task to delete old events:
 
 ```bash
-bin/rails events:purge
+bin/rails sinaliza:purge
 ```
 
 Schedule it with cron, Heroku Scheduler, or whatever you prefer.
 
 ## Database schema
 
-Events are stored in a single `events_events` table with polymorphic `actor` and `target` columns. The `metadata` column uses `json` type for cross-database compatibility (SQLite, PostgreSQL, MySQL).
+Events are stored in a single `sinaliza_events` table with polymorphic `actor` and `target` columns. The `metadata` column uses `json` type for cross-database compatibility (SQLite, PostgreSQL, MySQL).
 
 ## License
 

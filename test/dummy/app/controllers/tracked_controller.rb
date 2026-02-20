@@ -1,5 +1,5 @@
 class TrackedController < ApplicationController
-  include Events::Traceable
+  include Sinaliza::Traceable
 
   track_event "page.viewed", only: :index
   track_event "item.shown", only: :show, metadata: ->(controller = self) { { id: params[:id] } }
