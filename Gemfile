@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in events.gemspec.
+# Specify your gem's dependencies in sinaliza.gemspec.
 gemspec
 
 gem "puma"
