@@ -27,6 +27,10 @@
       <td><%= @event.target ? "#{@event.target_type}##{@event.target_id}" : "-" %></td>
     </tr>
     <tr>
+      <th>Context</th>
+      <td><%= @event.context ? "#{@event.context_type}##{@event.context_id}" : "-" %></td>
+    </tr>
+    <tr>
       <th>Metadata</th>
       <td><pre class="sinaliza-json"><%= JSON.pretty_generate(@event.metadata) %></pre></td>
     </tr>

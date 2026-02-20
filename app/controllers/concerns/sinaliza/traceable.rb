@@ -18,13 +18,14 @@ module Sinaliza
 
     private
 
-    def record_event(name, target: nil, parent: nil, metadata: {})
+    def record_event(name, target: nil, context: nil, parent: nil, metadata: {})
       actor = resolve_actor
 
       attributes = {
         name: name,
         actor: actor,
         target: target,
+        context: context,
         parent: parent,
         metadata: metadata,
         source: "controller"

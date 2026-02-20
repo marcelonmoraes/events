@@ -36,6 +36,16 @@
     </div>
 
     <div class="sinaliza-filters__field">
+      <label for="context_type">Context type</label>
+      <select name="context_type" id="context_type">
+        <option value="">All</option>
+        <% @filter_context_types.each do |type| %>
+          <option value="<%= type %>" <%= "selected" if params[:context_type] == type %>><%= type %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="sinaliza-filters__field">
       <label for="since">Since</label>
       <input type="date" name="since" id="since" value="<%= params[:since] %>">
     </div>
