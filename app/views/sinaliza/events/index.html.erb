@@ -11,6 +11,7 @@
         <th>Source</th>
         <th>Actor</th>
         <th>Target</th>
+        <th>Context</th>
         <th>Children</th>
         <th></th>
       </tr>
@@ -23,6 +24,7 @@
           <td><span class="sinaliza-badge sinaliza-badge--source"><%= event.source %></span></td>
           <td><%= event.actor ? "#{event.actor_type}##{event.actor_id}" : "-" %></td>
           <td><%= event.target ? "#{event.target_type}##{event.target_id}" : "-" %></td>
+          <td><%= event.context ? "#{event.context_type}##{event.context_id}" : "-" %></td>
           <td><%= event.children.size %></td>
           <td><%= link_to "Detail", event_path(event), class: "sinaliza-link" %></td>
         </tr>

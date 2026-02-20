@@ -39,6 +39,25 @@ module Sinaliza
       assert_select "table.sinaliza-table tbody tr", 1
     end
 
+    test "index filters by context_type" do
+      user = User.create!(name: "Alice")
+      Event.create!(name: "a", context: user, source: "test")
+      Event.create!(name: "b", source: "test")
+
+      get events_url(context_type: "User")
+      assert_response :success
+      assert_select "table.sinaliza-table tbody tr", 1
+    end
+
+    test "show displays context" do
+      user = User.create!(name: "Alice")
+      event = Event.create!(name: "test.context", context: user)
+
+      get event_url(event)
+      assert_response :success
+      assert_select "th", "Context"
+    end
+
     test "index cursor pagination" do
       events = 55.times.map { |i| Event.create!(name: "paginated.#{i}") }
 

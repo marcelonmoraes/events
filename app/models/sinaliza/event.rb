@@ -2,6 +2,7 @@ module Sinaliza
   class Event < ApplicationRecord
     belongs_to :actor, polymorphic: true, optional: true
     belongs_to :target, polymorphic: true, optional: true
+    belongs_to :context, polymorphic: true, optional: true
     belongs_to :parent, class_name: "Sinaliza::Event", optional: true
 
     has_many :children, class_name: "Sinaliza::Event", foreign_key: :parent_id, dependent: :destroy
@@ -11,6 +12,8 @@ module Sinaliza
     scope :by_name, ->(name) { where(name: name) }
     scope :by_source, ->(source) { where(source: source) }
     scope :by_actor_type, ->(type) { where(actor_type: type) }
+    scope :by_context, ->(context) { where(context_type: context.class.name, context_id: context.id) }
+    scope :by_context_type, ->(type) { where(context_type: type) }
     scope :since, ->(time) { where(created_at: time..) }
     scope :before, ->(time) { where(created_at: ..time) }
     scope :between, ->(from, to) { where(created_at: from..to) }
@@ -18,7 +21,7 @@ module Sinaliza
     scope :reverse_chronological, -> { order(created_at: :desc) }
     scope :roots, -> { where(parent_id: nil) }
     scope :search, ->(query) {
-      where("name LIKE :q OR source LIKE :q OR actor_type LIKE :q OR target_type LIKE :q", q: "%#{query}%")
+      where("name LIKE :q OR source LIKE :q OR actor_type LIKE :q OR target_type LIKE :q OR context_type LIKE :q", q: "%#{query}%")
     }
 
     def root?
