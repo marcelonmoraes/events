@@ -11,6 +11,7 @@ module Sinaliza
       @filter_names = Event.distinct.pluck(:name).sort
       @filter_sources = Event.distinct.pluck(:source).sort
       @filter_actor_types = Event.where.not(actor_type: nil).distinct.pluck(:actor_type).sort
+      @filter_context_types = Event.where.not(context_type: nil).distinct.pluck(:context_type).sort
     end
 
     def show
@@ -24,6 +25,7 @@ module Sinaliza
       @events = @events.by_name(params[:name]) if params[:name].present?
       @events = @events.by_source(params[:source]) if params[:source].present?
       @events = @events.by_actor_type(params[:actor_type]) if params[:actor_type].present?
+      @events = @events.by_context_type(params[:context_type]) if params[:context_type].present?
       @events = @events.search(params[:q]) if params[:q].present?
       @events = @events.since(Date.parse(params[:since])) if params[:since].present?
       @events = @events.before(Date.parse(params[:before]).end_of_day) if params[:before].present?

@@ -13,6 +13,10 @@ module Sinaliza
         attributes[:target] = GlobalID::Locator.locate(attributes[:target])
       end
 
+      if attributes[:context].is_a?(String)
+        attributes[:context] = GlobalID::Locator.locate(attributes[:context])
+      end
+
       Sinaliza::Event.create!(attributes)
     end
   end
