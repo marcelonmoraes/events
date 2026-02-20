@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Broaden Rails dependency to accept any version >= 8.0
+
 ## 0.1.0
 
 - Initial release
