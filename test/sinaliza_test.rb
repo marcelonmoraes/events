@@ -81,6 +81,31 @@ class SinalizaTest < ActiveSupport::TestCase
     assert_nil config.purge_after
   end
 
+  test "Sinaliza.record with context" do
+    user = User.create!(name: "Alice")
+    post = Post.create!(title: "Hello")
+
+    event = Sinaliza.record(
+      name: "post.viewed",
+      actor: user,
+      target: post,
+      context: user,
+      metadata: { page: 1 }
+    )
+
+    assert_equal user, event.actor
+    assert_equal post, event.target
+    assert_equal user, event.context
+  end
+
+  test "Sinaliza.record_later with context serializes as GlobalID" do
+    user = User.create!(name: "Alice")
+
+    assert_enqueued_with(job: Sinaliza::RecordEventJob) do
+      Sinaliza.record_later(name: "async.event", context: user)
+    end
+  end
+
   test "Sinaliza.record with parent event" do
     parent = Sinaliza.record(name: "order.completed")
     child = Sinaliza.record(name: "payment.processed", parent: parent)

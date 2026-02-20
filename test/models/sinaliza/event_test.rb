@@ -33,6 +33,15 @@ module Sinaliza
       assert_equal post, event.target
     end
 
+    test "polymorphic context association" do
+      user = User.create!(name: "Alice")
+      event = Event.create!(name: "subscription.renewed", context: user)
+
+      assert_equal "User", event.context_type
+      assert_equal user.id, event.context_id
+      assert_equal user, event.context
+    end
+
     test "by_name scope" do
       Event.create!(name: "login")
       Event.create!(name: "logout")
@@ -53,6 +62,22 @@ module Sinaliza
       Event.create!(name: "b")
 
       assert_equal 1, Event.by_actor_type("User").count
+    end
+
+    test "by_context scope" do
+      user = User.create!(name: "Alice")
+      Event.create!(name: "a", context: user)
+      Event.create!(name: "b")
+
+      assert_equal 1, Event.by_context(user).count
+    end
+
+    test "by_context_type scope" do
+      user = User.create!(name: "Alice")
+      Event.create!(name: "a", context: user)
+      Event.create!(name: "b")
+
+      assert_equal 1, Event.by_context_type("User").count
     end
 
     test "since scope" do
@@ -97,6 +122,13 @@ module Sinaliza
 
       assert_equal 1, Event.search("login").count
       assert_equal 1, Event.search("model").count
+    end
+
+    test "search scope includes context_type" do
+      user = User.create!(name: "Alice")
+      Event.create!(name: "test", context: user)
+
+      assert_equal 1, Event.search("User").count
     end
 
     test "metadata stores hash" do
