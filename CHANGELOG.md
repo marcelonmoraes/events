@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- Add actor, target, and context usage guideline to README
+
 ## 0.2.0
 
 - Add polymorphic `context` association for grouping events under a business object
