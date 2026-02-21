@@ -53,6 +53,39 @@ Both methods accept:
 | `context`   | Business context for grouping (any model) | `nil`            |
 | `parent`    | Parent event (for hierarchies)       | `nil`                 |
 
+### Actor, target, and context
+
+Every event supports three polymorphic associations. Each one answers a different question:
+
+| Association | Question             | Think of it as...                |
+|-------------|----------------------|----------------------------------|
+| `actor`     | **Who** did it?      | The subject of the sentence      |
+| `target`    | **What** was acted on? | The direct object of the verb  |
+| `context`   | **Within what** did it happen? | The broader business scope |
+
+A good rule of thumb: read the event as a sentence.
+
+> **Admin** refunded **payment** within **order**
+
+```ruby
+Sinaliza.record(name: "payment.refunded", actor: admin, target: payment, context: order)
+```
+
+More examples:
+
+```ruby
+# User published post within project
+Sinaliza.record(name: "post.published", actor: user, target: post, context: project)
+
+# User upgraded subscription (target and context can be the same)
+Sinaliza.record(name: "plan.upgraded", actor: user, target: subscription, context: subscription)
+
+# System sent invoice within subscription
+Sinaliza.record(name: "invoice.sent", actor: system, target: invoice, context: subscription)
+```
+
+When in doubt: `target` is the thing that changed, `context` is the thing you will want to query by later. You don't always need both — use only what makes sense for your domain.
+
 ### Model concern — `Sinaliza::Trackable`
 
 Include in any model to get event associations and helper methods:
