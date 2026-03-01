@@ -188,15 +188,31 @@ The engine mounts a monitor dashboard at your chosen path. It provides:
 
 ### Protecting the dashboard
 
-The gem does not include authentication. Protect access via route constraints in your host app:
+The gem does not include authentication. Protect access via route constraints in your host app.
+
+**With Devise:**
 
 ```ruby
 # config/routes.rb
 authenticate :user, ->(u) { u.admin? } do
   mount Sinaliza::Engine => "/sinaliza"
 end
+```
 
-# or with a simple constraint
+**Without Devise:**
+
+```ruby
+# app/constraints/admin_constraint.rb
+class AdminConstraint
+  def matches?(request)
+    user_id = request.session[:user_id]
+    return false unless user_id
+
+    User.find_by(id: user_id)&.admin?
+  end
+end
+
+# config/routes.rb
 mount Sinaliza::Engine => "/sinaliza", constraints: AdminConstraint.new
 ```
 
