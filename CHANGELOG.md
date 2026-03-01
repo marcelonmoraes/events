@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Add GitHub Pages documentation site
+- Expand dashboard protection examples with Devise and non-Devise approaches
+- Add `documentation_uri` to gemspec metadata
+
 ## 0.2.0
 
 - Add polymorphic `context` association for grouping events under a business object
