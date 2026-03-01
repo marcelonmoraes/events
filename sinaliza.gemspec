@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/marcelonmoraes/sinaliza/tree/main"
   spec.metadata["changelog_uri"] = "https://github.com/marcelonmoraes/sinaliza/blob/main/CHANGELOG.md"
+  spec.metadata["documentation_uri"] = "https://marcelonmoraes.github.io/sinaliza/"
 
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
