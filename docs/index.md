@@ -1,10 +1,20 @@
+---
+layout: default
+title: Home
+---
+
 # Sinaliza
 
 A Rails engine for recording and browsing application events. Track user actions, system events, and anything worth logging — from models, controllers, or anywhere in your code.
 
 Events are stored in the database and viewable through a mountable monitor dashboard.
 
-## Installation
+[View on GitHub](https://github.com/marcelonmoraes/sinaliza){: .btn }
+[RubyGems](https://rubygems.org/gems/sinaliza){: .btn }
+
+---
+
+## Quick Start
 
 Add to your Gemfile:
 
@@ -26,9 +36,11 @@ Mount the engine in your `config/routes.rb`:
 mount Sinaliza::Engine => "/sinaliza"
 ```
 
-## Usage
+---
 
-### Direct recording
+## Recording Events
+
+### From anywhere in your code
 
 ```ruby
 # Synchronous
@@ -53,7 +65,7 @@ Both methods accept:
 | `context`   | Business context for grouping (any model) | `nil`            |
 | `parent`    | Parent event (for hierarchies)       | `nil`                 |
 
-### Model concern — `Sinaliza::Trackable`
+### From models — `Sinaliza::Trackable`
 
 Include in any model to get event associations and helper methods:
 
@@ -63,8 +75,6 @@ class User < ApplicationRecord
 end
 ```
 
-This gives you:
-
 ```ruby
 user.events_as_actor    # events where user is the actor
 user.events_as_target   # events where user is the target
@@ -72,60 +82,15 @@ user.events_as_context  # events where user is the context
 
 user.track_event("profile.updated", metadata: { field: "email" })
 user.track_event("post.published", target: post, context: subscription)
-user.track_event("invoice.paid", target: invoice, context: subscription, parent: signup_event)
 
 post.track_event_as_target("post.featured", actor: admin)
 
 subscription.track_event_as_context("plan.upgraded", actor: user)
 ```
 
-Events are recorded with `source: "model"`. When an actor, target, or context is destroyed, associated events are preserved with nullified references (`dependent: :nullify`).
+### From controllers — `Sinaliza::Traceable`
 
-### Event context
-
-The `context` parameter is a polymorphic association that lets you group events under a business object. This is useful when multiple events belong to the same logical context — such as a subscription, an order, or a project.
-
-```ruby
-subscription = user.subscriptions.current
-
-# Record events within a subscription context
-Sinaliza.record(name: "plan.upgraded", actor: user, context: subscription, metadata: { from: "basic", to: "pro" })
-Sinaliza.record(name: "payment.processed", actor: user, context: subscription)
-Sinaliza.record(name: "invoice.sent", target: user, context: subscription)
-
-# Query events by context
-subscription.events_as_context                          # all events for this subscription
-Sinaliza::Event.by_context(subscription)                # same, via scope
-Sinaliza::Event.by_context_type("Subscription")         # all events for any subscription
-```
-
-### Parent & children events
-
-Events support a parent/children hierarchy. Use this to represent causal chains or group sub-steps under a main event.
-
-```ruby
-# Create a parent event
-signup = Sinaliza.record(name: "user.signed_up", actor: user)
-
-# Create child events
-Sinaliza.record(name: "welcome_email.sent", actor: user, parent: signup)
-Sinaliza.record(name: "default_settings.created", actor: user, parent: signup)
-
-# Navigate the hierarchy
-signup.children          # child events
-signup.root?             # => true
-signup.children.first.child?   # => true
-signup.children.first.parent   # => the signup event
-
-# Query only top-level events
-Sinaliza::Event.roots
-```
-
-When a parent event is destroyed, its children are also destroyed (`dependent: :destroy`).
-
-### Controller concern — `Sinaliza::Traceable`
-
-Include in any controller to track actions declaratively or manually:
+Track actions declaratively or manually:
 
 ```ruby
 class OrdersController < ApplicationController
@@ -150,25 +115,63 @@ class OrdersController < ApplicationController
 end
 ```
 
-Events are recorded with `source: "controller"`. Request context (IP address, user agent, request ID) is captured automatically based on configuration.
+---
 
-The actor is resolved by calling the method defined in `Sinaliza.configuration.actor_method` (default: `current_user`).
+## Event Context
 
-### Query scopes
+The `context` parameter is a polymorphic association that lets you group events under a business object — such as a subscription, an order, or a project.
+
+```ruby
+subscription = user.subscriptions.current
+
+Sinaliza.record(name: "plan.upgraded", actor: user, context: subscription,
+                metadata: { from: "basic", to: "pro" })
+Sinaliza.record(name: "payment.processed", actor: user, context: subscription)
+Sinaliza.record(name: "invoice.sent", target: user, context: subscription)
+
+# Query events by context
+subscription.events_as_context
+Sinaliza::Event.by_context(subscription)
+Sinaliza::Event.by_context_type("Subscription")
+```
+
+---
+
+## Parent & Children Events
+
+Events support a parent/children hierarchy for representing causal chains or grouping sub-steps under a main event.
+
+```ruby
+signup = Sinaliza.record(name: "user.signed_up", actor: user)
+
+Sinaliza.record(name: "welcome_email.sent", actor: user, parent: signup)
+Sinaliza.record(name: "default_settings.created", actor: user, parent: signup)
+
+signup.children
+signup.root?                         # => true
+signup.children.first.child?         # => true
+signup.children.first.parent         # => the signup event
+
+Sinaliza::Event.roots  # only top-level events
+```
+
+---
+
+## Query Scopes
 
 ```ruby
 Sinaliza::Event.by_name("user.login")
 Sinaliza::Event.by_source("controller")
 Sinaliza::Event.by_actor_type("User")
-Sinaliza::Event.by_context(subscription)            # events for a specific context record
-Sinaliza::Event.by_context_type("Subscription")     # events for any record of this type
-Sinaliza::Event.roots                                # only top-level events (no parent)
+Sinaliza::Event.by_context(subscription)
+Sinaliza::Event.by_context_type("Subscription")
+Sinaliza::Event.roots
 Sinaliza::Event.since(1.week.ago)
 Sinaliza::Event.before(Date.yesterday)
 Sinaliza::Event.between(1.week.ago, 1.day.ago)
 Sinaliza::Event.search("login")
-Sinaliza::Event.chronological          # oldest first
-Sinaliza::Event.reverse_chronological  # newest first
+Sinaliza::Event.chronological
+Sinaliza::Event.reverse_chronological
 ```
 
 Scopes are chainable:
@@ -178,17 +181,17 @@ Sinaliza::Event.by_name("order.created").by_actor_type("User").since(1.day.ago)
 Sinaliza::Event.by_context(subscription).roots.reverse_chronological
 ```
 
+---
+
 ## Dashboard
 
-The engine mounts a monitor dashboard at your chosen path. It provides:
+The engine mounts a monitor dashboard at your chosen path with:
 
 - Paginated event list (cursor-based, 50 per page)
 - Filtering by name, source, actor type, date range, and free-text search
 - Detail view for each event with formatted JSON metadata
 
 ### Protecting the dashboard
-
-The gem does not include authentication. Protect access via route constraints in your host app.
 
 **With Devise:**
 
@@ -216,28 +219,25 @@ end
 mount Sinaliza::Engine => "/sinaliza", constraints: AdminConstraint.new
 ```
 
+---
+
 ## Configuration
 
 ```ruby
 # config/initializers/sinaliza.rb
 Sinaliza.configure do |config|
-  # Controller method used to resolve the actor (default: :current_user)
   config.actor_method = :current_user
-
-  # Default source label for Sinaliza.record calls (default: "manual")
   config.default_source = "manual"
-
-  # Capture IP, user agent, and request ID in controller events (default: true)
   config.record_request_info = true
-
-  # Auto-purge events older than this duration (default: nil — no purging)
   config.purge_after = 90.days
 end
 ```
 
-## Purging old events
+---
 
-If `purge_after` is configured, run the rake task to delete old events:
+## Purging Old Events
+
+If `purge_after` is configured:
 
 ```bash
 bin/rails sinaliza:purge
@@ -245,10 +245,15 @@ bin/rails sinaliza:purge
 
 Schedule it with cron, Heroku Scheduler, or whatever you prefer.
 
-## Database schema
+---
 
-Events are stored in a single `sinaliza_events` table with polymorphic `actor`, `target`, and `context` columns, plus a `parent_id` foreign key for hierarchies. The `metadata` column uses `json` type for cross-database compatibility (SQLite, PostgreSQL, MySQL).
+## Requirements
+
+- Ruby >= 3.1
+- Rails >= 7.1, < 9
+
+---
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+Available as open source under the [MIT License](https://opensource.org/licenses/MIT).
