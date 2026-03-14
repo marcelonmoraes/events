@@ -39,6 +39,7 @@ module Sinaliza
       end
 
       def reset!
+        prepended_keys.clear
         authoritative_ids.clear
       end
 

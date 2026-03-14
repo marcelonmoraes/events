@@ -13,5 +13,16 @@ module Sinaliza
         # Database not created yet — skip
       end
     end
+
+    config.to_prepare do
+      ActiveRecord::Base.connection_pool.with_connection do
+        if ActiveRecord::Base.connection.table_exists?(:sinaliza_interceptors)
+          Sinaliza::InterceptorRegistry.reset!
+          Sinaliza::InterceptorRegistry.apply_all!
+        end
+      end
+    rescue ActiveRecord::NoDatabaseError
+      # Database not created yet — skip
+    end
   end
 end
