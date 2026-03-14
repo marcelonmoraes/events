@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Add dynamic interceptors for automatic method-level event tracking
+- Database-backed interceptor records with activate/deactivate support
+- Capture method arguments, return values, and execution time
+- Dashboard UI for managing interceptors (create, edit, toggle, delete)
+- Auto-apply interceptors on boot via Rails engine initializer
+
 ## 0.2.1
 
 - Add GitHub Pages documentation site

@@ -1,6 +1,7 @@
 require "sinaliza/version"
 require "sinaliza/engine"
 require "sinaliza/configuration"
+require "sinaliza/interceptor_registry"
 
 module Sinaliza
   class << self
@@ -27,6 +28,17 @@ module Sinaliza
         user_agent: user_agent,
         request_id: request_id
       )
+    end
+
+    def intercept(target_class, method_name, event_name:, method_type: "instance", **options)
+      interceptor = Sinaliza::Interceptor.create!(
+        target_class: target_class.to_s,
+        method_name: method_name.to_s,
+        method_type: method_type,
+        event_name: event_name,
+        **options
+      )
+      interceptor
     end
 
     def record_later(name:, actor: nil, target: nil, context: nil, parent: nil, metadata: {}, source: nil, ip_address: nil, user_agent: nil, request_id: nil)

@@ -1,0 +1,7 @@
+<div class="sinaliza-dashboard">
+  <p><%= link_to "Back to interceptors", interceptors_path, class: "sinaliza-link sinaliza-link--back" %></p>
+
+  <h1>Edit Interceptor</h1>
+
+  <%= render "form", url: interceptor_path(@interceptor), method: :patch %>
+</div>

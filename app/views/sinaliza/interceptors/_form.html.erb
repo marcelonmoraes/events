@@ -1,0 +1,42 @@
+<%= form_with model: @interceptor, url: url, method: method, class: "sinaliza-form" do |f| %>
+  <% if @interceptor.errors.any? %>
+    <div class="sinaliza-errors">
+      <ul>
+        <% @interceptor.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="sinaliza-form__field">
+    <%= f.label :target_class, "Target class" %>
+    <%= f.text_field :target_class, placeholder: "User" %>
+  </div>
+
+  <div class="sinaliza-form__field">
+    <%= f.label :method_name, "Method name" %>
+    <%= f.text_field :method_name, placeholder: "update_profile" %>
+  </div>
+
+  <div class="sinaliza-form__field">
+    <%= f.label :method_type, "Method type" %>
+    <%= f.select :method_type, Sinaliza::Interceptor::METHOD_TYPES %>
+  </div>
+
+  <div class="sinaliza-form__field">
+    <%= f.label :event_name, "Event name" %>
+    <%= f.text_field :event_name, placeholder: "user.profile_updated" %>
+  </div>
+
+  <div class="sinaliza-form__checkboxes">
+    <label><%= f.check_box :capture_args %> Capture arguments</label>
+    <label><%= f.check_box :capture_return %> Capture return value</label>
+    <label><%= f.check_box :capture_execution_time %> Capture execution time</label>
+  </div>
+
+  <div class="sinaliza-form__actions">
+    <%= f.submit class: "sinaliza-btn" %>
+    <%= link_to "Cancel", interceptors_path, class: "sinaliza-link" %>
+  </div>
+<% end %>

@@ -154,6 +154,61 @@ Events are recorded with `source: "controller"`. Request context (IP address, us
 
 The actor is resolved by calling the method defined in `Sinaliza.configuration.actor_method` (default: `current_user`).
 
+### Interceptors
+
+Interceptors let you automatically record events whenever a specific method is called — without modifying the original code. They are stored in the database and can be managed at runtime through the dashboard or programmatically.
+
+```ruby
+# Create an interceptor that tracks every call to User#send_welcome_email
+Sinaliza::Interceptor.create!(
+  target_class: "User",
+  method_name: "send_welcome_email",
+  method_type: "instance",
+  event_name: "user.welcome_email_sent"
+)
+
+# Track a class method
+Sinaliza::Interceptor.create!(
+  target_class: "Report",
+  method_name: "generate_monthly",
+  method_type: "class",
+  event_name: "report.monthly_generated"
+)
+```
+
+Each interceptor can optionally capture:
+
+| Option                   | Description                              | Default |
+|--------------------------|------------------------------------------|---------|
+| `capture_args`           | Log method arguments in metadata         | `false` |
+| `capture_return`         | Log the return value in metadata         | `false` |
+| `capture_execution_time` | Log execution time (ms) in metadata      | `false` |
+
+```ruby
+# Interceptor with full instrumentation
+Sinaliza::Interceptor.create!(
+  target_class: "PaymentGateway",
+  method_name: "charge",
+  method_type: "instance",
+  event_name: "payment.charged",
+  capture_args: true,
+  capture_return: true,
+  capture_execution_time: true
+)
+```
+
+Interceptors can be toggled on and off without removing them:
+
+```ruby
+interceptor = Sinaliza::Interceptor.find_by(event_name: "user.welcome_email_sent")
+interceptor.deactivate!  # stops recording events
+interceptor.activate!    # resumes recording events
+```
+
+Events recorded by interceptors have `source: "interceptor"`.
+
+The dashboard includes an **Interceptors** section where you can create, edit, toggle, and delete interceptors through a web interface.
+
 ### Query scopes
 
 ```ruby
