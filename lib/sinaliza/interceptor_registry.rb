@@ -13,25 +13,22 @@ module Sinaliza
         # Store the authoritative interceptor ID for this key
         authoritative_ids[key] = interceptor.id
 
-        # Only prepend the module once per key (prepend is permanent)
-        unless prepended_keys.include?(key)
-          klass = interceptor.target_class.constantize
+        klass = interceptor.target_class.constantize
+        target = interceptor.method_type == "class" ? klass.singleton_class : klass
+        class_id = target.object_id
+
+        # Only prepend if the class object changed (reloaded) or never prepended
+        unless prepended_classes[key] == class_id
           mod = build_module(key)
-
-          if interceptor.method_type == "class"
-            klass.singleton_class.prepend(mod)
-          else
-            klass.prepend(mod)
-          end
-
-          prepended_keys.add(key)
+          target.prepend(mod)
+          prepended_classes[key] = class_id
         end
       rescue NameError
         # Target class does not exist — skip
       end
 
       def applied?(interceptor)
-        prepended_keys.include?(interceptor.key)
+        prepended_classes.key?(interceptor.key)
       end
 
       def authoritative_id_for(key)
@@ -39,7 +36,7 @@ module Sinaliza
       end
 
       def reset!
-        prepended_keys.clear
+        prepended_classes.clear
         authoritative_ids.clear
       end
 
@@ -49,8 +46,8 @@ module Sinaliza
         @authoritative_ids ||= {}
       end
 
-      def prepended_keys
-        @prepended_keys ||= Set.new
+      def prepended_classes
+        @prepended_classes ||= {}
       end
 
       def build_module(key)
