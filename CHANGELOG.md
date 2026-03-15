@@ -6,7 +6,11 @@
 - Database-backed interceptor records with activate/deactivate support
 - Capture method arguments, return values, and execution time
 - Dashboard UI for managing interceptors (create, edit, toggle, delete)
-- Auto-apply interceptors on boot via Rails engine initializer
+- Toggle switch UI for activating/deactivating interceptors
+- Auto-apply interceptors on boot and after class reloading in development
+- Reentrancy guard to prevent duplicate events on internally chained calls
+- Validate target class and method existence on interceptor creation
+- Set intercepted object as event target for instance methods
 
 ## 0.2.1
 
