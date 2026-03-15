@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sinaliza (0.2.1)
+    sinaliza (0.3.0)
       rails (>= 7.1, < 9)
 
 GEM
