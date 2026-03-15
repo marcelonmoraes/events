@@ -1,5 +1,5 @@
 <div class="sinaliza-dashboard">
-  <p><%= link_to "Back to events", events_path, class: "sinaliza-link" %></p>
+  <p><%= link_to "Back to events", events_path, class: "sinaliza-link sinaliza-link--back" %></p>
 
   <h1>Event #<%= @event.id %></h1>
 
@@ -20,15 +20,33 @@
     </tr>
     <tr>
       <th>Actor</th>
-      <td><%= @event.actor ? "#{@event.actor_type}##{@event.actor_id}" : "-" %></td>
+      <td>
+        <% if @event.actor %>
+          <span class="sinaliza-ref"><%= @event.actor_type %>#<%= @event.actor_id %></span>
+        <% else %>
+          <span class="sinaliza-null">&mdash;</span>
+        <% end %>
+      </td>
     </tr>
     <tr>
       <th>Target</th>
-      <td><%= @event.target ? "#{@event.target_type}##{@event.target_id}" : "-" %></td>
+      <td>
+        <% if @event.target %>
+          <span class="sinaliza-ref"><%= @event.target_type %>#<%= @event.target_id %></span>
+        <% else %>
+          <span class="sinaliza-null">&mdash;</span>
+        <% end %>
+      </td>
     </tr>
     <tr>
       <th>Context</th>
-      <td><%= @event.context ? "#{@event.context_type}##{@event.context_id}" : "-" %></td>
+      <td>
+        <% if @event.context %>
+          <span class="sinaliza-ref"><%= @event.context_type %>#<%= @event.context_id %></span>
+        <% else %>
+          <span class="sinaliza-null">&mdash;</span>
+        <% end %>
+      </td>
     </tr>
     <tr>
       <th>Metadata</th>
@@ -36,19 +54,25 @@
     </tr>
     <tr>
       <th>IP address</th>
-      <td><%= @event.ip_address || "-" %></td>
+      <td><%= @event.ip_address || content_tag(:span, "&mdash;".html_safe, class: "sinaliza-null") %></td>
     </tr>
     <tr>
       <th>User agent</th>
-      <td><%= @event.user_agent || "-" %></td>
+      <td><%= @event.user_agent || content_tag(:span, "&mdash;".html_safe, class: "sinaliza-null") %></td>
     </tr>
     <tr>
       <th>Request ID</th>
-      <td><%= @event.request_id || "-" %></td>
+      <td>
+        <% if @event.request_id %>
+          <span class="sinaliza-ref"><%= @event.request_id %></span>
+        <% else %>
+          <span class="sinaliza-null">&mdash;</span>
+        <% end %>
+      </td>
     </tr>
     <tr>
       <th>Created at</th>
-      <td><%= @event.created_at.strftime("%Y-%m-%d %H:%M:%S %Z") %></td>
+      <td class="sinaliza-time"><%= @event.created_at.strftime("%Y-%m-%d %H:%M:%S %Z") %></td>
     </tr>
   </table>
 
@@ -72,8 +96,20 @@
             <td class="sinaliza-time"><%= child.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
             <td><span class="sinaliza-badge"><%= child.name %></span></td>
             <td><span class="sinaliza-badge sinaliza-badge--source"><%= child.source %></span></td>
-            <td><%= child.actor ? "#{child.actor_type}##{child.actor_id}" : "-" %></td>
-            <td><%= child.target ? "#{child.target_type}##{child.target_id}" : "-" %></td>
+            <td>
+              <% if child.actor %>
+                <span class="sinaliza-ref"><%= child.actor_type %>#<%= child.actor_id %></span>
+              <% else %>
+                <span class="sinaliza-null">&mdash;</span>
+              <% end %>
+            </td>
+            <td>
+              <% if child.target %>
+                <span class="sinaliza-ref"><%= child.target_type %>#<%= child.target_id %></span>
+              <% else %>
+                <span class="sinaliza-null">&mdash;</span>
+              <% end %>
+            </td>
             <td><%= link_to "Detail", event_path(child), class: "sinaliza-link" %></td>
           </tr>
         <% end %>

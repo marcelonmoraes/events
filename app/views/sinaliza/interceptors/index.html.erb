@@ -1,0 +1,57 @@
+<div class="sinaliza-dashboard">
+  <div class="sinaliza-header">
+    <h1>Interceptors</h1>
+    <%= link_to "New interceptor", new_interceptor_path, class: "sinaliza-btn" %>
+  </div>
+
+  <table class="sinaliza-table">
+    <thead>
+      <tr>
+        <th>Target</th>
+        <th>Event name</th>
+        <th>Capture</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @interceptors.each do |interceptor| %>
+        <tr>
+          <td><span class="sinaliza-badge"><%= interceptor.key %></span></td>
+          <td><span class="sinaliza-badge sinaliza-badge--source"><%= interceptor.event_name %></span></td>
+          <td>
+            <% captures = [] %>
+            <% captures << "args" if interceptor.capture_args %>
+            <% captures << "return" if interceptor.capture_return %>
+            <% captures << "time" if interceptor.capture_execution_time %>
+            <% if captures.any? %>
+              <% captures.each do |c| %>
+                <span class="sinaliza-capture-tag"><%= c %></span>
+              <% end %>
+            <% else %>
+              <span class="sinaliza-null">&mdash;</span>
+            <% end %>
+          </td>
+          <td>
+            <%= button_to toggle_interceptor_path(interceptor), method: :patch, class: "sinaliza-switch-form" do %>
+              <span class="sinaliza-switch <%= 'sinaliza-switch--on' if interceptor.active? %>">
+                <span class="sinaliza-switch__track">
+                  <span class="sinaliza-switch__knob"></span>
+                </span>
+              </span>
+            <% end %>
+          </td>
+          <td class="sinaliza-actions">
+            <%= link_to "Edit", edit_interceptor_path(interceptor), class: "sinaliza-link" %>
+            <%= button_to "Delete", interceptor_path(interceptor), method: :delete,
+                data: { turbo_confirm: "Are you sure?" }, class: "sinaliza-link sinaliza-link--danger" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @interceptors.empty? %>
+    <p class="sinaliza-empty">No interceptors configured.</p>
+  <% end %>
+</div>

@@ -1,5 +1,5 @@
 <div class="sinaliza-dashboard">
-  <h1>Events Monitor</h1>
+  <h1>Events</h1>
 
   <%= render "filters" %>
 
@@ -22,10 +22,31 @@
           <td class="sinaliza-time"><%= event.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
           <td><span class="sinaliza-badge"><%= event.name %></span></td>
           <td><span class="sinaliza-badge sinaliza-badge--source"><%= event.source %></span></td>
-          <td><%= event.actor ? "#{event.actor_type}##{event.actor_id}" : "-" %></td>
-          <td><%= event.target ? "#{event.target_type}##{event.target_id}" : "-" %></td>
-          <td><%= event.context ? "#{event.context_type}##{event.context_id}" : "-" %></td>
-          <td><%= event.children.size %></td>
+          <td>
+            <% if event.actor %>
+              <span class="sinaliza-ref"><%= event.actor_type %>#<%= event.actor_id %></span>
+            <% else %>
+              <span class="sinaliza-null">&mdash;</span>
+            <% end %>
+          </td>
+          <td>
+            <% if event.target %>
+              <span class="sinaliza-ref"><%= event.target_type %>#<%= event.target_id %></span>
+            <% else %>
+              <span class="sinaliza-null">&mdash;</span>
+            <% end %>
+          </td>
+          <td>
+            <% if event.context %>
+              <span class="sinaliza-ref"><%= event.context_type %>#<%= event.context_id %></span>
+            <% else %>
+              <span class="sinaliza-null">&mdash;</span>
+            <% end %>
+          </td>
+          <td>
+            <% count = event.children.size %>
+            <span class="sinaliza-children-count <%= 'sinaliza-children-count--has' if count > 0 %>"><%= count %></span>
+          </td>
           <td><%= link_to "Detail", event_path(event), class: "sinaliza-link" %></td>
         </tr>
       <% end %>
