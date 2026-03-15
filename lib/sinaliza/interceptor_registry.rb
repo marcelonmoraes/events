@@ -55,6 +55,12 @@ module Sinaliza
           method_name = key.include?("#") ? key.split("#").last : key.split(".").last
 
           define_method(method_name.to_sym) do |*args, **kwargs, &block|
+            # Prevent reentrant recording (e.g. ActiveRecord calling save internally)
+            thread_key = :"_sinaliza_interceptor_#{key}"
+            if Thread.current[thread_key]
+              return super(*args, **kwargs, &block)
+            end
+
             auth_id = Sinaliza::InterceptorRegistry.authoritative_id_for(key)
             record = auth_id ? Sinaliza::Interceptor.find_by(id: auth_id) : nil
 
@@ -69,8 +75,13 @@ module Sinaliza
               metadata[:kwargs] = kwargs.transform_values(&:inspect) if kwargs.any?
             end
 
-            start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) if record.capture_execution_time
-            result = super(*args, **kwargs, &block)
+            begin
+              Thread.current[thread_key] = true
+              start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) if record.capture_execution_time
+              result = super(*args, **kwargs, &block)
+            ensure
+              Thread.current[thread_key] = nil
+            end
 
             if record.capture_execution_time && start_time
               elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
