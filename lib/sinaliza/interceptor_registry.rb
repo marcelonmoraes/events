@@ -51,8 +51,10 @@ module Sinaliza
       end
 
       def build_module(key)
+        is_instance = key.include?("#")
+
         Module.new do
-          method_name = key.include?("#") ? key.split("#").last : key.split(".").last
+          method_name = is_instance ? key.split("#").last : key.split(".").last
 
           define_method(method_name.to_sym) do |*args, **kwargs, &block|
             # Prevent reentrant recording (e.g. ActiveRecord calling save internally)
@@ -90,7 +92,14 @@ module Sinaliza
 
             metadata[:return] = result.inspect if record.capture_return
 
-            Sinaliza.record(name: record.event_name, metadata: metadata, source: "interceptor")
+            event_attrs = { name: record.event_name, metadata: metadata, source: "interceptor" }
+
+            # For instance methods, self is the target object
+            if is_instance && self.class < ActiveRecord::Base
+              event_attrs[:target] = self
+            end
+
+            Sinaliza.record(**event_attrs)
             result
           end
         end
