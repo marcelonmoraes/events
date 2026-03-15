@@ -33,15 +33,17 @@
             <% end %>
           </td>
           <td>
-            <%= link_to toggle_interceptor_path(interceptor), method: :patch, class: "sinaliza-toggle" do %>
-              <span class="sinaliza-status sinaliza-status--<%= interceptor.active? ? 'active' : 'inactive' %>">
-                <%= interceptor.active? ? "Active" : "Inactive" %>
+            <%= button_to toggle_interceptor_path(interceptor), method: :patch, class: "sinaliza-switch-form" do %>
+              <span class="sinaliza-switch <%= 'sinaliza-switch--on' if interceptor.active? %>">
+                <span class="sinaliza-switch__track">
+                  <span class="sinaliza-switch__knob"></span>
+                </span>
               </span>
             <% end %>
           </td>
           <td class="sinaliza-actions">
             <%= link_to "Edit", edit_interceptor_path(interceptor), class: "sinaliza-link" %>
-            <%= link_to "Delete", interceptor_path(interceptor), method: :delete,
+            <%= button_to "Delete", interceptor_path(interceptor), method: :delete,
                 data: { turbo_confirm: "Are you sure?" }, class: "sinaliza-link sinaliza-link--danger" %>
           </td>
         </tr>
